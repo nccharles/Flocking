@@ -1,14 +1,14 @@
 class Boid {
   constructor() {
-    this.position = createVector(width / 2, height / 2);
+    this.position = createVector(random(width), random(height));
     this.velocity = p5.Vector.random2D();
     this.acceleration = createVector();
   }
 
   align(boids) {
-    let perceptionRadius = 100;
+    let perceptionRadius = 50;
     let total = 0;
-    let avg = createVector();
+    let steeling = createVector();
 
     for (let other of boids) {
       let d = dist(
@@ -18,13 +18,19 @@ class Boid {
         other.position.y
       );
       if (other !== this && d < perceptionRadius) {
-        avg.add(other.velocity);
+        steeling.add(other.velocity);
         total++;
       }
     }
     if (total > 0) {
-      avg.div(boids.length);
+      steeling.div(total);
+      steeling.sub(this.velocity);
     }
+    return steeling;
+  }
+  flock(boids) {
+    let alignment = this.align(boids);
+    this.acceleration = alignment;
   }
   update() {
     this.position.add(this.velocity);
@@ -32,7 +38,7 @@ class Boid {
   }
 
   show() {
-    strokeWeight(16);
+    strokeWeight(8);
     stroke(255);
     point(this.position.x, this.position.y);
   }
